@@ -50,4 +50,15 @@ public class GM{
         return true;
     }
 
+    public void desaloca(int[] tabelaPaginas){
+
+        if(tabelaPaginas == null){
+            return;
+        } else {
+            for (int i = 0; i < tabelaPaginas.length -1; i++) {
+                OCUPADO[tabelaPaginas[i]] = false;
+            }
+        }
+    }
+
 }
