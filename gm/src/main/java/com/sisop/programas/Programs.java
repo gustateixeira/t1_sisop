@@ -4,7 +4,7 @@ import com.sisop.hardware.cpu.Opcode;
 import com.sisop.hardware.memoria.Word;
 
 public class Programs {
-    private class Program {
+    public class Program {
         public String name;
         public Word[] image;
     
@@ -21,7 +21,7 @@ public class Programs {
                 return p.image;
         }
         return null;
-    }
+    }   
 
     public Program[] progs = {
             new Program("fatorial",
