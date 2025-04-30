@@ -1,7 +1,7 @@
-package com.sisop.hardware;
-import com.sisop.hardware.cpu.CPU;
-import com.sisop.hardware.memoria.Memory;
+package main.java.com.sisop.hardware;
 
+import main.java.com.sisop.hardware.cpu.CPU;
+import main.java.com.sisop.hardware.memoria.Memory;
 
 
 public class HW {

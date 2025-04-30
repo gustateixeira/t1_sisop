@@ -1,5 +1,4 @@
-package com.sisop.software.gm;
-
+package main.java.com.sisop.software.gm;
 
 public class GM{
     private final int TAMPG;
@@ -59,6 +58,10 @@ public class GM{
                 OCUPADO[tabelaPaginas[i]] = false;
             }
         }
+    }
+
+    public int getTamanhoPagina() {
+        return TAMPG;
     }
 
 }

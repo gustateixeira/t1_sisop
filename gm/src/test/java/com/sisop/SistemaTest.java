@@ -1,12 +1,10 @@
-package com.sisop;
+package test.java.com.sisop;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import main.java.com.sisop.software.gm.GM;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import  com.sisop.software.gm.GM;
-
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SistemaTest {
     private GM gm;
@@ -20,7 +18,7 @@ public class SistemaTest {
     public void alocaTest()
     {
         boolean actual= gm.aloca(32, new int[5]);
-     
-        assertEquals (true,actual );
+
+        assertTrue(actual);
     }
 }

@@ -1,77 +1,81 @@
-package com.sisop.software.gp;
+package main.java.com.sisop.software.gp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.sisop.programas.Programs.Program;
-import com.sisop.software.gm.GM;
+import main.java.com.sisop.hardware.HW;
+import main.java.com.sisop.programas.Programs;
+import main.java.com.sisop.software.gm.GM;
 
 public class GP {
+    private HW hw;
 
     public class PCB {
-        private boolean estado; // Se esta executando o
+        private boolean estado;
         private long id;
         private static long idCounter = 0;
-        private int pc;
+        public int pc;
         private int memSize;
-        private int[] tabelaPaginas;
+        public int[] tabelaPaginas;
         private String nome;
         private int[] registradores;
         private boolean finalizado = false;
 
-
-        public PCB(){
+        public PCB() {
             this.estado = false;
-            this.id = idCounter;
-            idCounter++;
+            this.id = idCounter++;
         }
 
-        public void setId(long id){
-            this.id = id;
-        }
-        public void setPc(int pc){
-            this.pc = pc;
-        }
-        public void setMemSize(int memSize){
-            this.memSize = memSize;
-        }
-        public void setTabelaPaginas(int [] tabelaPg){
-            this.tabelaPaginas = tabelaPg;
-        }
-        public void setEstado(boolean state){
-            this.estado = state;
-        }
-        public void setNome(String nome){
-            this.nome = nome;
-        }
-        public String toString(){
-            return "Nome: " + this.nome +" Id: " + this.id + " Pc:" + this.pc + " memSize: " + this.memSize + " Tabela de paginas: " + Arrays.toString(this.tabelaPaginas);
-        }
-        public long getId(){
-            return this.id;
-        }
-        public String getNome(){
-            return this.nome;
-        }
-    
+        public void setId(long id) { this.id = id; }
+        public void setPc(int pc) { this.pc = pc; }
+        public void setMemSize(int memSize) { this.memSize = memSize; }
+        public void setTabelaPaginas(int[] tabelaPg) { this.tabelaPaginas = tabelaPg; }
+        public void setEstado(boolean state) { this.estado = state; }
+        public void setNome(String nome) { this.nome = nome; }
+        public long getId() { return this.id; }
+        public String getNome() { return this.nome; }
+        public void setRegistradores(int[] r) { this.registradores = r.clone(); }
+        public int[] getRegistradores() { return this.registradores; }
+        public void setFinalizado(boolean f) { this.finalizado = f; }
+        public boolean isFinalizado() { return finalizado; }
 
+        public String toString() {
+            return "Nome: " + nome + " Id: " + id + " Pc: " + pc + " memSize: " + memSize +
+                    " Tabela de paginas: " + Arrays.toString(tabelaPaginas);
+        }
     }
-    public List<PCB> prontos;
-    public List<PCB> rodando; //lista de pcbs
-    private GM gm; //gerente de memória
 
-    public GP(GM gm){
+    public List<PCB> prontos;
+    public List<PCB> rodando;
+    private GM gm;
+
+    public GP(HW hw, GM gm) {
+        this.hw = hw;
         this.gm = gm;
         this.rodando = new ArrayList<>();
         this.prontos = new ArrayList<>();
     }
-    
 
-    public boolean criaProcesso(Program p){
-    
-        int [] tabelaPaginas = new int[p.image.length];
-        if(!gm.aloca(p.image.length, tabelaPaginas)){
+    public boolean criaProcesso(Programs.Program p) {
+        int tamPag = gm.getTamanhoPagina();
+        int pagsNecessarias = (int) Math.ceil((double) p.image.length / tamPag);
+        int[] tabelaPaginas = new int[pagsNecessarias];
+
+        if (!gm.aloca(p.image.length, tabelaPaginas)) {
             return false;
+        }
+
+        // Carregar programa nas páginas físicas alocadas
+        int indexMemoria = 0;
+        for (int i = 0; i < pagsNecessarias; i++) {
+            int frameBase = tabelaPaginas[i] * tamPag;
+            for (int j = 0; j < tamPag && indexMemoria < p.image.length; j++) {
+                hw.mem.pos[frameBase + j].opc = p.image[indexMemoria].opc;
+                hw.mem.pos[frameBase + j].ra = p.image[indexMemoria].ra;
+                hw.mem.pos[frameBase + j].rb = p.image[indexMemoria].rb;
+                hw.mem.pos[frameBase + j].p = p.image[indexMemoria].p;
+                indexMemoria++;
+            }
         }
 
         PCB pcb = new PCB();
@@ -80,33 +84,15 @@ public class GP {
         pcb.setMemSize(p.image.length);
         pcb.setEstado(false);
         pcb.setNome(p.name);
-        this.prontos.add(pcb);
+        prontos.add(pcb);
         return true;
     }
-     
-    public void desalocaProcesso(long id){
-        PCB desaloc = this.prontos.stream().filter(pcb -> pcb.id == id).findFirst().orElse(null);
-        gm.desaloca(desaloc.tabelaPaginas);
-        this.prontos.remove(desaloc);
+
+    public void desalocaProcesso(long id) {
+        PCB desaloc = prontos.stream().filter(pcb -> pcb.id == id).findFirst().orElse(null);
+        if (desaloc != null) {
+            gm.desaloca(desaloc.tabelaPaginas);
+            prontos.remove(desaloc);
+        }
     }
-
-    public void setRegistradores(int[] r) {
-        this.registradores = r.clone();
-    }
-
-    public int[] getRegistradores() {
-        return this.registradores;
-    }
-
-    public void setFinalizado(boolean f) {
-        this.finalizado = f;
-    }
-
-    public boolean isFinalizado() {
-        return finalizado;
-    }
-
-
-
-
 }

@@ -1,10 +1,11 @@
-package com.sisop.hardware.cpu;
+package main.java.com.sisop.hardware.cpu;
 
-import com.sisop.hardware.memoria.Memory;
-import com.sisop.hardware.memoria.Word;
-import com.sisop.software.rotinasDeTratamento.InterruptHandling;
-import com.sisop.software.rotinasDeTratamento.SysCallHandling;
-import com.sisop.software.utilidades.Utilities;
+
+import main.java.com.sisop.hardware.memoria.Memory;
+import main.java.com.sisop.hardware.memoria.Word;
+import main.java.com.sisop.software.rotinasDeTratamento.InterruptHandling;
+import main.java.com.sisop.software.rotinasDeTratamento.SysCallHandling;
+import main.java.com.sisop.software.utilidades.Utilities;
 
 public class CPU {
     private int maxInt; // valores maximo e minimo para inteiros nesta cpu
@@ -29,6 +30,8 @@ public class CPU {
                                 // auxilio aa depuração
     private boolean debug;      // se true entao mostra cada instrucao em execucao
     private Utilities u;        // para debug (dump)
+    private boolean terminouComStop = false;
+
 
     public CPU(Memory _mem, boolean _debug) { // ref a MEMORIA passada na criacao da CPU
         maxInt = 32767;            // capacidade de representacao modelada
@@ -78,6 +81,7 @@ public class CPU {
 
     public void run() {                               // execucao da CPU supoe que o contexto da CPU, vide acima, 
                                                       // esta devidamente setado
+        terminouComStop = false;
         cpuStop = false;
         while (!cpuStop) {      // ciclo de instrucoes. acaba cfe resultado da exec da instrucao, veja cada caso.
 
@@ -261,8 +265,9 @@ public class CPU {
                         pc++;
                         break;
 
-                    case STOP: // por enquanto, para execucao
+                    case STOP:
                         sysCall.stop();
+                        terminouComStop = true;
                         cpuStop = true;
                         break;
 
@@ -297,7 +302,12 @@ public class CPU {
         this.pc = newPC;
     }
 
+    public boolean terminou() {
+        return terminouComStop;
+    }
+
     public void runFor(int delta) {
+        terminouComStop = false;
         cpuStop = false;
         int executed = 0;
         while (!cpuStop && executed < delta) {
@@ -344,7 +354,11 @@ public class CPU {
 
                     case SYSCALL: sysCall.handle(); pc++; break;
 
-                    case STOP: sysCall.stop(); cpuStop = true; break;
+                    case STOP:
+                        sysCall.stop();
+                        terminouComStop = true;
+                        cpuStop = true;
+                        break;
 
                     default: irpt = Interrupts.intInstrucaoInvalida; break;
                 }
@@ -358,5 +372,4 @@ public class CPU {
             executed++;
         }
     }
-
 }

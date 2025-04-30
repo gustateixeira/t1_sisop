@@ -1,15 +1,4 @@
-package com.sisop;
-import java.awt.im.InputContext;
-import java.security.spec.RSAOtherPrimeInfo;
-import java.util.Arrays;
-import java.util.Scanner;
-
-import com.sisop.hardware.HW;
-import com.sisop.programas.Programs;
-import com.sisop.software.gm.GM;
-import com.sisop.software.gp.GP;
-import com.sisop.software.so.SO;
-import org.w3c.dom.ls.LSOutput;
+package main.java.com.sisop;
 
 // PUCRS - Escola Politécnica - Sistemas Operacionais
 // Prof. Fernando Dotti
@@ -32,6 +21,16 @@ import org.w3c.dom.ls.LSOutput;
 //           Isto representa programas armazenados.
 //    Veja o main.  Ele instancia o Sistema com os elementos mencionados acima.
 //           em seguida solicita a execução de algum programa com  loadAndExec
+
+import main.java.com.sisop.hardware.HW;
+import main.java.com.sisop.hardware.cpu.Opcode;
+import main.java.com.sisop.programas.Programs;
+import main.java.com.sisop.software.gp.GP;
+import main.java.com.sisop.software.so.SO;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 public class Sistema {
 
@@ -139,7 +138,7 @@ public class Sistema {
 
                 // Verifica se chegou ao STOP (simplesmente checando se pc saiu do programa)
                 // alternativa: use uma flag setada no SysCallHandling ou CPU
-                if (hw.mem.pos[pcb.pc].opc == com.sisop.hardware.cpu.Opcode.STOP) {
+                if (hw.cpu.terminou()) {
                     System.out.println("==> Processo " + pcb.getId() + " terminou.");
                     pcb.setFinalizado(true);
                     so.gm.desaloca(pcb.tabelaPaginas);

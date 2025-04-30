@@ -1,15 +1,11 @@
-package com.sisop.software.so;
+package main.java.com.sisop.software.so;
 
-import java.util.List;
-
-import com.sisop.hardware.HW;
-import com.sisop.software.gm.GM;
-import com.sisop.software.gp.GP;
-import com.sisop.software.rotinasDeTratamento.InterruptHandling;
-import com.sisop.software.rotinasDeTratamento.SysCallHandling;
-import com.sisop.software.utilidades.Utilities;
-
-
+import main.java.com.sisop.hardware.HW;
+import main.java.com.sisop.software.gm.GM;
+import main.java.com.sisop.software.gp.GP;
+import main.java.com.sisop.software.rotinasDeTratamento.InterruptHandling;
+import main.java.com.sisop.software.rotinasDeTratamento.SysCallHandling;
+import main.java.com.sisop.software.utilidades.Utilities;
 
 public class SO {
     public InterruptHandling ih;
@@ -25,6 +21,7 @@ public class SO {
         hw.cpu.setAddressOfHandlers(ih, sc);
         utils = new Utilities(hw);
         gm = new GM(128,hw.mem.pos.length);
-        gp = new GP(gm);
+        gp = new GP(hw, gm);
+
     }
 }

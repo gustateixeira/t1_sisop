@@ -1,7 +1,7 @@
-package com.sisop.software.utilidades;
-import com.sisop.hardware.HW;
-import com.sisop.hardware.memoria.Word;
+package main.java.com.sisop.software.utilidades;
 
+import main.java.com.sisop.hardware.HW;
+import main.java.com.sisop.hardware.memoria.Word;
 
 public class Utilities {
     private HW hw;

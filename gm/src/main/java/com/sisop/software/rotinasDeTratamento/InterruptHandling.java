@@ -1,6 +1,7 @@
-package com.sisop.software.rotinasDeTratamento;
-import com.sisop.hardware.cpu.Interrupts;
-import com.sisop.hardware.HW;
+package main.java.com.sisop.software.rotinasDeTratamento;
+
+import main.java.com.sisop.hardware.HW;
+import main.java.com.sisop.hardware.cpu.Interrupts;
 
 public class InterruptHandling {
     private HW hw; // referencia ao hw se tiver que setar algo
