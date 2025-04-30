@@ -1,8 +1,8 @@
-package main.java.com.sisop.programas;
+package com.sisop.programas;
 
 
-import main.java.com.sisop.hardware.cpu.Opcode;
-import main.java.com.sisop.hardware.memoria.Word;
+import com.sisop.hardware.cpu.Opcode;
+import com.sisop.hardware.memoria.Word;
 
 public class Programs {
 

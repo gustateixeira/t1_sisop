@@ -1,6 +1,6 @@
-package main.java.com.sisop.hardware.memoria;
+package com.sisop.hardware.memoria;
 
-import main.java.com.sisop.hardware.cpu.Opcode;
+import com.sisop.hardware.cpu.Opcode;
 
 public class Memory {
 		public Word[] pos; // pos[i] é a posição i da memória. cada posição é uma palavra.

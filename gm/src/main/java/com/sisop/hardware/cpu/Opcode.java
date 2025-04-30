@@ -1,4 +1,4 @@
-package main.java.com.sisop.hardware.cpu;
+package com.sisop.hardware.cpu;
 
 
 public enum Opcode {

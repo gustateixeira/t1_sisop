@@ -1,7 +1,7 @@
-package main.java.com.sisop.software.utilidades;
+package com.sisop.software.utilidades;
 
-import main.java.com.sisop.hardware.HW;
-import main.java.com.sisop.hardware.memoria.Word;
+import com.sisop.hardware.HW;
+import  com.sisop.hardware.memoria.Word;
 
 public class Utilities {
     private HW hw;
@@ -42,13 +42,13 @@ public class Utilities {
         }
     }
 
-    public void     loadAndExec(Word[] p) {
+    public void loadAndExec(Word[] p, boolean traceOn) {
         loadProgram(p); // carga do programa na memoria
         System.out.println("---------------------------------- programa carregado na memoria");
         dump(0, p.length); // dump da memoria nestas posicoes
         hw.cpu.setContext(0); // seta pc para endereço 0 - ponto de entrada dos programas
         System.out.println("---------------------------------- inicia execucao ");
-        hw.cpu.run(); // cpu roda programa ate parar
+        hw.cpu.run(traceOn); // cpu roda programa ate parar
         System.out.println("---------------------------------- memoria após execucao ");
         dump(0, p.length); // dump da memoria com resultado
     }

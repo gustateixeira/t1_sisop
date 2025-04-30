@@ -1,11 +1,12 @@
-package main.java.com.sisop.software.gp;
+package com.sisop.software.gp;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import main.java.com.sisop.hardware.HW;
-import main.java.com.sisop.programas.Programs;
-import main.java.com.sisop.software.gm.GM;
+import com.sisop.hardware.HW;
+import com.sisop.programas.Programs;
+import com.sisop.software.gm.GM;
 
 public class GP {
     private HW hw;
@@ -89,8 +90,10 @@ public class GP {
     }
 
     public void desalocaProcesso(long id) {
+
         PCB desaloc = prontos.stream().filter(pcb -> pcb.id == id).findFirst().orElse(null);
         if (desaloc != null) {
+            System.out.println("DESALOCANDO");
             gm.desaloca(desaloc.tabelaPaginas);
             prontos.remove(desaloc);
         }

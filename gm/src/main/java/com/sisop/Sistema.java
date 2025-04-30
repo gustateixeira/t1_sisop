@@ -1,4 +1,4 @@
-package main.java.com.sisop;
+package com.sisop;
 
 // PUCRS - Escola Politécnica - Sistemas Operacionais
 // Prof. Fernando Dotti
@@ -22,11 +22,10 @@ package main.java.com.sisop;
 //    Veja o main.  Ele instancia o Sistema com os elementos mencionados acima.
 //           em seguida solicita a execução de algum programa com  loadAndExec
 
-import main.java.com.sisop.hardware.HW;
-import main.java.com.sisop.hardware.cpu.Opcode;
-import main.java.com.sisop.programas.Programs;
-import main.java.com.sisop.software.gp.GP;
-import main.java.com.sisop.software.so.SO;
+import com.sisop.hardware.HW;
+import com.sisop.programas.Programs;
+import com.sisop.software.gp.GP;
+import com.sisop.software.so.SO;
 
 import java.util.Arrays;
 import java.util.List;
@@ -62,6 +61,7 @@ public class Sistema {
 
 		Scanner sc = new Scanner(System.in);
         String input;
+        boolean traceOn = false;
         do {
             input = sc.next();
             if (input.equals("new")) {
@@ -70,7 +70,8 @@ public class Sistema {
                 this.so.gp.criaProcesso(Arrays.stream(progs.progs).filter(program -> program.name.equals(name)).findFirst().get());
             }
             if (input.equals("rm")) {
-                this.so.gp.desalocaProcesso(sc.nextLong());
+                int id = sc.nextInt();
+                this.so.gp.desalocaProcesso(id);
             }
             if (input.equals("ps")) {
                 System.out.println(this.so.gp.prontos);
@@ -86,10 +87,16 @@ public class Sistema {
             if (input.equals("exec")) {
 				int index = sc.nextInt();
 				GP.PCB pcb = this.so.gp.prontos.get(index);
-				so.utils.loadAndExec(progs.retrieveProgram(pcb.getNome()));
+				so.utils.loadAndExec(progs.retrieveProgram(pcb.getNome()), traceOn);
 			}
             if (input.equals("execAll")) {
                 execAll();
+            }
+            if(input.equals("traceOn")){
+                traceOn = true;
+            }
+            if(input.equals("traceOff")){
+                traceOn = false;
             }
 
         } while (!input.equals("exit"));
