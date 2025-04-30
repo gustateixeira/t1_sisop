@@ -1,5 +1,5 @@
 package com.sisop.hardware.cpu;
 
 public enum Interrupts {           // possiveis interrupcoes que esta CPU gera
-    noInterrupt, intEnderecoInvalido, intInstrucaoInvalida, intOverflow, intSTOP;
+    noInterrupt, intEnderecoInvalido, intInstrucaoInvalida, intOverflow, intSTOP,INT_CLOCK;
 }

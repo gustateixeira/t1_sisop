@@ -16,6 +16,8 @@ public class GP {
         private int memSize;
         private int[] tabelaPaginas;
         private String nome;
+        private int[] regContext;
+        private int pcContext;
 
 
         public PCB(){
@@ -42,6 +44,12 @@ public class GP {
         public void setNome(String nome){
             this.nome = nome;
         }
+        public void setRegContext(int[] regContext){
+            this.regContext = regContext;
+        }
+        public void setPcContext(int pcContext) {
+            this.pcContext = pcContext;
+        }
         public String toString(){
             return "Nome: " + this.nome +" Id: " + this.id + " Pc:" + this.pc + " memSize: " + this.memSize + " Tabela de paginas: " + Arrays.toString(this.tabelaPaginas);
         }
@@ -50,6 +58,12 @@ public class GP {
         }
         public String getNome(){
             return this.nome;
+        }
+        public int[] getRegContext() {
+            return this.regContext;
+        }
+        public int getPcContext() {
+            return this.pcContext;
         }
     
 

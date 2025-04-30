@@ -30,6 +30,9 @@ public class CPU {
     private boolean debug;      // se true entao mostra cada instrucao em execucao
     private Utilities u;        // para debug (dump)
 
+    private int cycleCounter = 0;
+    private final int DELTA = 5;
+
     public CPU(Memory _mem, boolean _debug) { // ref a MEMORIA passada na criacao da CPU
         maxInt = 32767;            // capacidade de representacao modelada
         minInt = -32767;           // se exceder deve gerar interrupcao de overflow
@@ -272,6 +275,12 @@ public class CPU {
                         break;
                 }
             }
+
+            if (++cycleCounter >= DELTA) {
+                irpt = Interrupts.INT_CLOCK;
+                cycleCounter = 0;
+            }
+            
             // --------------------------------------------------------------------------------------------------
             // VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
             if (irpt != Interrupts.noInterrupt) { // existe interrupção
