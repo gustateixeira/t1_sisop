@@ -4,6 +4,8 @@ import com.sisop.hardware.cpu.Opcode;
 import com.sisop.hardware.memoria.Word;
 
 public class Programs {
+
+
     public class Program {
         public String name;
         public Word[] image;

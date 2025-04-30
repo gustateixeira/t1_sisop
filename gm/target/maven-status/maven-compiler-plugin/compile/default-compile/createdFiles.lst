@@ -1,15 +1,7 @@
-com\sisop\hardware\memoria\Memory.class
-com\sisop\Sistema.class
-com\sisop\hardware\cpu\CPU.class
-com\sisop\software\gm\GM.class
-com\sisop\software\utilidades\Utilities.class
-com\sisop\hardware\cpu\Interrupts.class
-com\sisop\hardware\memoria\Word.class
 com\sisop\software\rotinasDeTratamento\InterruptHandling.class
-com\sisop\hardware\HW.class
 com\sisop\programas\Programs$Program.class
-com\sisop\hardware\cpu\Opcode.class
-com\sisop\hardware\cpu\CPU$1.class
+com\sisop\software\gm\GM.class
 com\sisop\software\rotinasDeTratamento\SysCallHandling.class
+com\sisop\software\utilidades\Utilities.class
 com\sisop\programas\Programs.class
 com\sisop\software\so\SO.class

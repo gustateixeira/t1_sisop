@@ -1,7 +1,15 @@
 package com.sisop;
-import  com.sisop.hardware.HW;
+import java.awt.im.InputContext;
+import java.security.spec.RSAOtherPrimeInfo;
+import java.util.Arrays;
+import java.util.Scanner;
+
+import com.sisop.hardware.HW;
 import com.sisop.programas.Programs;
+import com.sisop.software.gm.GM;
+import com.sisop.software.gp.GP;
 import com.sisop.software.so.SO;
+import org.w3c.dom.ls.LSOutput;
 
 // PUCRS - Escola Politécnica - Sistemas Operacionais
 // Prof. Fernando Dotti
@@ -38,9 +46,51 @@ public class Sistema {
 		progs = new Programs();
 	}
 
+
 	public void run() {
 
-		so.utils.loadAndExec(progs.retrieveProgram("fatorialV2"));
+        System.out.println("""
+                COMANDOS:\
+                new <NOME>
+                rm <id>\s
+                ps
+                dump\s
+                dumpM
+                exec <id>\s
+                traceOn\s
+                traceOff\s
+                exit""");
+
+		Scanner sc = new Scanner(System.in);
+        String input;
+        do {
+            input = sc.next();
+            if (input.equals("new")) {
+                String name = sc.next();
+                System.out.println(name);
+                this.so.gp.criaProcesso(Arrays.stream(progs.progs).filter(program -> program.name.equals(name)).findFirst().get());
+            }
+            if (input.equals("rm")) {
+                this.so.gp.desalocaProcesso(sc.nextLong());
+            }
+            if (input.equals("ps")) {
+                System.out.println(this.so.gp.prontos);
+            }
+            if (input.equals("dump")) {
+                int i = sc.nextInt();
+                System.out.println(this.so.gp.prontos.get(i - 1));
+                so.utils.dump(progs.progs[sc.nextInt()].image[0]);
+            }
+            if (input.equals("dumpM")) {
+                so.utils.dump(sc.nextInt(), sc.nextInt());
+            }
+            if (input.equals("exec")) {
+				int index = sc.nextInt();
+				GP.PCB pcb = this.so.gp.prontos.get(index);
+				so.utils.loadAndExec(progs.retrieveProgram(pcb.getNome()));
+			}
+
+        } while (!input.equals("exit"));
 
 		// so.utils.loadAndExec(progs.retrieveProgram("fatorial"));
 		// fibonacci10,
@@ -55,6 +105,7 @@ public class Sistema {
 	public static void main(String args[]) {
 		Sistema s = new Sistema(1024);
 		s.run();
+
 	}
 
 	

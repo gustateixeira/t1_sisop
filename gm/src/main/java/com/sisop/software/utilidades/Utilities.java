@@ -42,7 +42,7 @@ public class Utilities {
         }
     }
 
-    public void loadAndExec(Word[] p) {
+    public void     loadAndExec(Word[] p) {
         loadProgram(p); // carga do programa na memoria
         System.out.println("---------------------------------- programa carregado na memoria");
         dump(0, p.length); // dump da memoria nestas posicoes
