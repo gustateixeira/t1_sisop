@@ -16,6 +16,8 @@ public class GP {
         private int memSize;
         private int[] tabelaPaginas;
         private String nome;
+        private int[] registradores;
+        private boolean finalizado = false;
 
 
         public PCB(){
@@ -88,6 +90,23 @@ public class GP {
         this.prontos.remove(desaloc);
     }
 
-        
+    public void setRegistradores(int[] r) {
+        this.registradores = r.clone();
+    }
+
+    public int[] getRegistradores() {
+        return this.registradores;
+    }
+
+    public void setFinalizado(boolean f) {
+        this.finalizado = f;
+    }
+
+    public boolean isFinalizado() {
+        return finalizado;
+    }
+
+
+
 
 }

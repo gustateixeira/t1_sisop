@@ -89,6 +89,9 @@ public class Sistema {
 				GP.PCB pcb = this.so.gp.prontos.get(index);
 				so.utils.loadAndExec(progs.retrieveProgram(pcb.getNome()));
 			}
+            if (input.equals("execAll")) {
+                execAll();
+            }
 
         } while (!input.equals("exit"));
 
@@ -108,6 +111,46 @@ public class Sistema {
 
 	}
 
-	
+    public void execAll() {
+        int delta = 5;
+        List<GP.PCB> prontos = so.gp.prontos;
+
+        while (!prontos.isEmpty()) {
+            for (int i = 0; i < prontos.size(); i++) {
+                GP.PCB pcb = prontos.get(i);
+                if (pcb.isFinalizado()) continue;
+
+                System.out.println("==> Executando processo ID: " + pcb.getId() + " - " + pcb.getNome());
+
+                // Recupera contexto do processo
+                hw.cpu.setPC(pcb.pc);
+                if (pcb.getRegistradores() == null) {
+                    hw.cpu.setRegs(new int[10]); // inicializa regs
+                } else {
+                    hw.cpu.setRegs(pcb.getRegistradores());
+                }
+
+                // Executa fatia de tempo
+                hw.cpu.runFor(delta);
+
+                // Salva contexto de volta no PCB
+                pcb.setPc(hw.cpu.getPC());
+                pcb.setRegistradores(hw.cpu.getRegs());
+
+                // Verifica se chegou ao STOP (simplesmente checando se pc saiu do programa)
+                // alternativa: use uma flag setada no SysCallHandling ou CPU
+                if (hw.mem.pos[pcb.pc].opc == com.sisop.hardware.cpu.Opcode.STOP) {
+                    System.out.println("==> Processo " + pcb.getId() + " terminou.");
+                    pcb.setFinalizado(true);
+                    so.gm.desaloca(pcb.tabelaPaginas);
+                    prontos.remove(i);
+                    i--; // ajustar índice pois removeu da lista
+                }
+            }
+        }
+    }
+
+
+
 
 }
