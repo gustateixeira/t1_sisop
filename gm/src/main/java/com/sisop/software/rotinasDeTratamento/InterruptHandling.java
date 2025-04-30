@@ -10,9 +10,15 @@ public class InterruptHandling {
         hw = _hw;
     }
 
+    public void handle(Interrupts irpt, boolean trace) {
+        // apenas avisa - todas interrupcoes neste momento finalizam o programa
+        if (trace)
+            System.out.println(
+                "                                               Interrupcao " + irpt + "   pc: " + hw.cpu.pc);
+    }
     public void handle(Interrupts irpt) {
         // apenas avisa - todas interrupcoes neste momento finalizam o programa
         System.out.println(
-                "                                               Interrupcao " + irpt + "   pc: " + hw.cpu.pc);
+                    "                                               Interrupcao " + irpt + "   pc: " + hw.cpu.pc);
     }
 }

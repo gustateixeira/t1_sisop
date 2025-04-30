@@ -498,70 +498,286 @@ public class CPU {
         return terminouComStop;
     }
 
-    public void runFor(int delta) {
+    public void runFor(int delta, boolean trace) {
         terminouComStop = false;
         cpuStop = false;
         int executed = 0;
-        while (!cpuStop && executed < delta) {
-            if (legal(pc)) {
-                ir = m[pc];
+        if (trace) {
+            while (!cpuStop && executed < delta) {
+                if (legal(pc)) {
+                    ir = m[pc];
 
-                if (debug) {
-                    System.out.print("                                              regs: ");
-                    for (int i = 0; i < 10; i++) {
-                        System.out.print(" r[" + i + "]:" + reg[i]);
+                    if (debug) {
+                        System.out.print("                                              regs: ");
+                        for (int i = 0; i < 10; i++) {
+                            System.out.print(" r[" + i + "]:" + reg[i]);
+                        }
+                        System.out.println();
+                        System.out.print("                      pc: " + pc + "       exec: ");
+                        u.dump(ir);
                     }
-                    System.out.println();
-                    System.out.print("                      pc: " + pc + "       exec: ");
-                    u.dump(ir);
+
+                    switch (ir.opc) {
+                        case LDI:
+                            reg[ir.ra] = ir.p;
+                            pc++;
+                            break;
+                        case LDD:
+                            if (legal(ir.p)) {
+                                reg[ir.ra] = m[ir.p].p;
+                                pc++;
+                            }
+                            break;
+                        case LDX:
+                            if (legal(reg[ir.rb])) {
+                                reg[ir.ra] = m[reg[ir.rb]].p;
+                                pc++;
+                            }
+                            break;
+                        case STD:
+                            if (legal(ir.p)) {
+                                m[ir.p].opc = Opcode.DATA;
+                                m[ir.p].p = reg[ir.ra];
+                                pc++;
+                            }
+                            break;
+                        case STX:
+                            if (legal(reg[ir.ra])) {
+                                m[reg[ir.ra]].opc = Opcode.DATA;
+                                m[reg[ir.ra]].p = reg[ir.rb];
+                                pc++;
+                            }
+                            break;
+                        case MOVE:
+                            reg[ir.ra] = reg[ir.rb];
+                            pc++;
+                            break;
+                        case ADD:
+                            reg[ir.ra] += reg[ir.rb];
+                            testOverflow(reg[ir.ra]);
+                            pc++;
+                            break;
+                        case ADDI:
+                            reg[ir.ra] += ir.p;
+                            testOverflow(reg[ir.ra]);
+                            pc++;
+                            break;
+                        case SUB:
+                            reg[ir.ra] -= reg[ir.rb];
+                            testOverflow(reg[ir.ra]);
+                            pc++;
+                            break;
+                        case SUBI:
+                            reg[ir.ra] -= ir.p;
+                            testOverflow(reg[ir.ra]);
+                            pc++;
+                            break;
+                        case MULT:
+                            reg[ir.ra] *= reg[ir.rb];
+                            testOverflow(reg[ir.ra]);
+                            pc++;
+                            break;
+
+                        case JMP:
+                            pc = ir.p;
+                            break;
+                        case JMPIM:
+                            pc = m[ir.p].p;
+                            break;
+                        case JMPIG:
+                            pc = (reg[ir.rb] > 0) ? reg[ir.ra] : pc + 1;
+                            break;
+                        case JMPIGK:
+                            pc = (reg[ir.rb] > 0) ? ir.p : pc + 1;
+                            break;
+                        case JMPILK:
+                            pc = (reg[ir.rb] < 0) ? ir.p : pc + 1;
+                            break;
+                        case JMPIEK:
+                            pc = (reg[ir.rb] == 0) ? ir.p : pc + 1;
+                            break;
+                        case JMPIL:
+                            pc = (reg[ir.rb] < 0) ? reg[ir.ra] : pc + 1;
+                            break;
+                        case JMPIE:
+                            pc = (reg[ir.rb] == 0) ? reg[ir.ra] : pc + 1;
+                            break;
+                        case JMPIGM:
+                            if (legal(ir.p)) pc = (reg[ir.rb] > 0) ? m[ir.p].p : pc + 1;
+                            break;
+                        case JMPILM:
+                            if (legal(ir.p)) pc = (reg[ir.rb] < 0) ? m[ir.p].p : pc + 1;
+                            break;
+                        case JMPIEM:
+                            if (legal(ir.p)) pc = (reg[ir.rb] == 0) ? m[ir.p].p : pc + 1;
+                            break;
+                        case JMPIGT:
+                            pc = (reg[ir.ra] > reg[ir.rb]) ? ir.p : pc + 1;
+                            break;
+
+                        case DATA:
+                            irpt = Interrupts.intInstrucaoInvalida;
+                            break;
+
+                        case SYSCALL:
+                            sysCall.handle();
+                            pc++;
+                            break;
+
+                        case STOP:
+                            sysCall.stop();
+                            terminouComStop = true;
+                            cpuStop = true;
+                            break;
+
+                        default:
+                            irpt = Interrupts.intInstrucaoInvalida;
+                            break;
+                    }
                 }
 
-                switch (ir.opc) {
-                    case LDI: reg[ir.ra] = ir.p; pc++; break;
-                    case LDD: if (legal(ir.p)) { reg[ir.ra] = m[ir.p].p; pc++; } break;
-                    case LDX: if (legal(reg[ir.rb])) { reg[ir.ra] = m[reg[ir.rb]].p; pc++; } break;
-                    case STD: if (legal(ir.p)) { m[ir.p].opc = Opcode.DATA; m[ir.p].p = reg[ir.ra]; pc++; } break;
-                    case STX: if (legal(reg[ir.ra])) { m[reg[ir.ra]].opc = Opcode.DATA; m[reg[ir.ra]].p = reg[ir.rb]; pc++; } break;
-                    case MOVE: reg[ir.ra] = reg[ir.rb]; pc++; break;
-                    case ADD: reg[ir.ra] += reg[ir.rb]; testOverflow(reg[ir.ra]); pc++; break;
-                    case ADDI: reg[ir.ra] += ir.p; testOverflow(reg[ir.ra]); pc++; break;
-                    case SUB: reg[ir.ra] -= reg[ir.rb]; testOverflow(reg[ir.ra]); pc++; break;
-                    case SUBI: reg[ir.ra] -= ir.p; testOverflow(reg[ir.ra]); pc++; break;
-                    case MULT: reg[ir.ra] *= reg[ir.rb]; testOverflow(reg[ir.ra]); pc++; break;
-
-                    case JMP: pc = ir.p; break;
-                    case JMPIM: pc = m[ir.p].p; break;
-                    case JMPIG: pc = (reg[ir.rb] > 0) ? reg[ir.ra] : pc + 1; break;
-                    case JMPIGK: pc = (reg[ir.rb] > 0) ? ir.p : pc + 1; break;
-                    case JMPILK: pc = (reg[ir.rb] < 0) ? ir.p : pc + 1; break;
-                    case JMPIEK: pc = (reg[ir.rb] == 0) ? ir.p : pc + 1; break;
-                    case JMPIL: pc = (reg[ir.rb] < 0) ? reg[ir.ra] : pc + 1; break;
-                    case JMPIE: pc = (reg[ir.rb] == 0) ? reg[ir.ra] : pc + 1; break;
-                    case JMPIGM: if (legal(ir.p)) pc = (reg[ir.rb] > 0) ? m[ir.p].p : pc + 1; break;
-                    case JMPILM: if (legal(ir.p)) pc = (reg[ir.rb] < 0) ? m[ir.p].p : pc + 1; break;
-                    case JMPIEM: if (legal(ir.p)) pc = (reg[ir.rb] == 0) ? m[ir.p].p : pc + 1; break;
-                    case JMPIGT: pc = (reg[ir.ra] > reg[ir.rb]) ? ir.p : pc + 1; break;
-
-                    case DATA: irpt = Interrupts.intInstrucaoInvalida; break;
-
-                    case SYSCALL: sysCall.handle(); pc++; break;
-
-                    case STOP:
-                        sysCall.stop();
-                        terminouComStop = true;
-                        cpuStop = true;
-                        break;
-
-                    default: irpt = Interrupts.intInstrucaoInvalida; break;
+                if (irpt != Interrupts.noInterrupt) {
+                    ih.handle(irpt);
+                    cpuStop = true;
                 }
+
+                executed++;
+            }
+        }else{
+            while (!cpuStop && executed < delta) {
+                if (legal(pc)) {
+                    ir = m[pc];
+                    if (debug) {
+                        u.dump(ir);
+                    }
+
+                    switch (ir.opc) {
+                        case LDI:
+                            reg[ir.ra] = ir.p;
+                            pc++;
+                            break;
+                        case LDD:
+                            if (legal(ir.p)) {
+                                reg[ir.ra] = m[ir.p].p;
+                                pc++;
+                            }
+                            break;
+                        case LDX:
+                            if (legal(reg[ir.rb])) {
+                                reg[ir.ra] = m[reg[ir.rb]].p;
+                                pc++;
+                            }
+                            break;
+                        case STD:
+                            if (legal(ir.p)) {
+                                m[ir.p].opc = Opcode.DATA;
+                                m[ir.p].p = reg[ir.ra];
+                                pc++;
+                            }
+                            break;
+                        case STX:
+                            if (legal(reg[ir.ra])) {
+                                m[reg[ir.ra]].opc = Opcode.DATA;
+                                m[reg[ir.ra]].p = reg[ir.rb];
+                                pc++;
+                            }
+                            break;
+                        case MOVE:
+                            reg[ir.ra] = reg[ir.rb];
+                            pc++;
+                            break;
+                        case ADD:
+                            reg[ir.ra] += reg[ir.rb];
+                            testOverflow(reg[ir.ra]);
+                            pc++;
+                            break;
+                        case ADDI:
+                            reg[ir.ra] += ir.p;
+                            testOverflow(reg[ir.ra]);
+                            pc++;
+                            break;
+                        case SUB:
+                            reg[ir.ra] -= reg[ir.rb];
+                            testOverflow(reg[ir.ra]);
+                            pc++;
+                            break;
+                        case SUBI:
+                            reg[ir.ra] -= ir.p;
+                            testOverflow(reg[ir.ra]);
+                            pc++;
+                            break;
+                        case MULT:
+                            reg[ir.ra] *= reg[ir.rb];
+                            testOverflow(reg[ir.ra]);
+                            pc++;
+                            break;
+
+                        case JMP:
+                            pc = ir.p;
+                            break;
+                        case JMPIM:
+                            pc = m[ir.p].p;
+                            break;
+                        case JMPIG:
+                            pc = (reg[ir.rb] > 0) ? reg[ir.ra] : pc + 1;
+                            break;
+                        case JMPIGK:
+                            pc = (reg[ir.rb] > 0) ? ir.p : pc + 1;
+                            break;
+                        case JMPILK:
+                            pc = (reg[ir.rb] < 0) ? ir.p : pc + 1;
+                            break;
+                        case JMPIEK:
+                            pc = (reg[ir.rb] == 0) ? ir.p : pc + 1;
+                            break;
+                        case JMPIL:
+                            pc = (reg[ir.rb] < 0) ? reg[ir.ra] : pc + 1;
+                            break;
+                        case JMPIE:
+                            pc = (reg[ir.rb] == 0) ? reg[ir.ra] : pc + 1;
+                            break;
+                        case JMPIGM:
+                            if (legal(ir.p)) pc = (reg[ir.rb] > 0) ? m[ir.p].p : pc + 1;
+                            break;
+                        case JMPILM:
+                            if (legal(ir.p)) pc = (reg[ir.rb] < 0) ? m[ir.p].p : pc + 1;
+                            break;
+                        case JMPIEM:
+                            if (legal(ir.p)) pc = (reg[ir.rb] == 0) ? m[ir.p].p : pc + 1;
+                            break;
+                        case JMPIGT:
+                            pc = (reg[ir.ra] > reg[ir.rb]) ? ir.p : pc + 1;
+                            break;
+
+                        case DATA:
+                            irpt = Interrupts.intInstrucaoInvalida;
+                            break;
+
+                        case SYSCALL:
+                            sysCall.handle(trace);
+                            pc++;
+                            break;
+
+                        case STOP:
+                            sysCall.stop();
+                            terminouComStop = true;
+                            cpuStop = true;
+                            break;
+
+                        default:
+                            irpt = Interrupts.intInstrucaoInvalida;
+                            break;
+                    }
+                }
+
+                if (irpt != Interrupts.noInterrupt) {
+                    ih.handle(irpt, trace);
+                    cpuStop = true;
+                }
+
+                executed++;
             }
 
-            if (irpt != Interrupts.noInterrupt) {
-                ih.handle(irpt);
-                cpuStop = true;
-            }
-
-            executed++;
         }
     }
 }

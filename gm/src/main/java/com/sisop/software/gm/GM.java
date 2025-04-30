@@ -64,11 +64,6 @@ public class GM{
             Word[] memo = this.m.pos;
             for (int tabelaPagina : tabelaPaginas) {
                 OCUPADO[tabelaPagina] = false;
-                System.out.println(Arrays.toString(memo));
-                for (int j = tabelaPagina * this.TAMPG; j < (tabelaPagina + 1) * this.TAMPG; j++) {
-                    System.out.println("Memoria: " + memo[j]);
-                    memo[j] = new Word(Opcode.___, -1, -1, -1);
-                }
             }
         }
     }

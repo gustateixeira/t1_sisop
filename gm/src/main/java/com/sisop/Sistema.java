@@ -90,7 +90,7 @@ public class Sistema {
 				so.utils.loadAndExec(progs.retrieveProgram(pcb.getNome()), traceOn);
 			}
             if (input.equals("execAll")) {
-                execAll();
+                execAll(traceOn);
             }
             if(input.equals("traceOn")){
                 traceOn = true;
@@ -117,7 +117,7 @@ public class Sistema {
 
 	}
 
-    public void execAll() {
+    public void execAll(boolean trace) {
         int delta = 5;
         List<GP.PCB> prontos = so.gp.prontos;
 
@@ -125,8 +125,8 @@ public class Sistema {
             for (int i = 0; i < prontos.size(); i++) {
                 GP.PCB pcb = prontos.get(i);
                 if (pcb.isFinalizado()) continue;
-
-                System.out.println("==> Executando processo ID: " + pcb.getId() + " - " + pcb.getNome());
+                if(trace)
+                    System.out.println("==> Executando processo ID: " + pcb.getId() + " - " + pcb.getNome());
 
                 // Recupera contexto do processo
                 hw.cpu.setPC(pcb.pc);
@@ -137,7 +137,7 @@ public class Sistema {
                 }
 
                 // Executa fatia de tempo
-                hw.cpu.runFor(delta);
+                hw.cpu.runFor(delta, trace );
 
                 // Salva contexto de volta no PCB
                 pcb.setPc(hw.cpu.getPC());

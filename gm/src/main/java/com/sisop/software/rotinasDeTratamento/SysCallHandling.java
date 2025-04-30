@@ -27,4 +27,7 @@ public class SysCallHandling {
 				  System.out.println("OUT:   "+ hw.mem.pos[hw.cpu.reg[9]].p);
 			} else {System.out.println("  PARAMETRO INVALIDO"); }		
 		}
+	public void handle(boolean trace) { // chamada de sistema
+
+	}
 	}
