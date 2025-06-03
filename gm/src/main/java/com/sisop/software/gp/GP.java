@@ -1,12 +1,12 @@
-package com.sisop.software.gp;
+package main.java.com.sisop.software.gp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.sisop.hardware.HW;
-import com.sisop.programas.Programs;
-import com.sisop.software.gm.GM;
+import main.java.com.sisop.hardware.HW;
+import main.java.com.sisop.programas.Programs;
+import main.java.com.sisop.software.gm.GM;
 
 public class GP {
     private HW hw;
@@ -59,7 +59,13 @@ public class GP {
 
     public boolean criaProcesso(Programs.Program p) {
         int tamPag = gm.getTamanhoPagina();
-        int pagsNecessarias = (int) Math.ceil((double) p.image.length / tamPag);
+        int pagsNecessarias = 1;
+        System.out.println("tamanho do processo: " + p.image.length);
+        System.out.println("tamanho da pagina: " + tamPag);
+        if(p.image.length > tamPag){
+            pagsNecessarias = (int) Math.ceil((double) p.image.length / tamPag);
+            System.out.println("Paginas necessarias: " + pagsNecessarias);
+        }
         int[] tabelaPaginas = new int[pagsNecessarias];
 
         if (!gm.aloca(p.image.length, tabelaPaginas)) {
@@ -93,7 +99,6 @@ public class GP {
 
         PCB desaloc = prontos.stream().filter(pcb -> pcb.id == id).findFirst().orElse(null);
         if (desaloc != null) {
-            System.out.println("DESALOCANDO");
             gm.desaloca(desaloc.tabelaPaginas);
             prontos.remove(desaloc);
         }

@@ -1,7 +1,7 @@
-package com.sisop.hardware.memoria;
+package main.java.com.sisop.hardware.memoria;
 
 
-import com.sisop.hardware.cpu.Opcode;
+import main.java.com.sisop.hardware.cpu.Opcode;
 
 public class Word {    // cada posicao da memoria tem uma instrucao (ou um dado)
     public Opcode opc; //

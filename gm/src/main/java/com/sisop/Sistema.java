@@ -1,4 +1,4 @@
-package com.sisop;
+package main.java.com.sisop;
 
 // PUCRS - Escola Politécnica - Sistemas Operacionais
 // Prof. Fernando Dotti
@@ -22,10 +22,10 @@ package com.sisop;
 //    Veja o main.  Ele instancia o Sistema com os elementos mencionados acima.
 //           em seguida solicita a execução de algum programa com  loadAndExec
 
-import com.sisop.hardware.HW;
-import com.sisop.programas.Programs;
-import com.sisop.software.gp.GP;
-import com.sisop.software.so.SO;
+import main.java.com.sisop.hardware.HW;
+import main.java.com.sisop.programas.Programs;
+import main.java.com.sisop.software.gp.GP;
+import main.java.com.sisop.software.so.SO;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,19 +45,21 @@ public class Sistema {
 	}
 
 
-	public void run() {
+	public void run() throws InterruptedException {
 
         System.out.println("""
                 COMANDOS:\
                 new <NOME>
                 rm <id>\s
                 ps
-                dump\s
+                dump<id processo>\s
                 dumpM
                 exec <id>\s
                 traceOn\s
                 traceOff\s
+                execAll\s
                 exit""");
+
 
 		Scanner sc = new Scanner(System.in);
         String input;
@@ -82,13 +84,21 @@ public class Sistema {
                 so.utils.dump(progs.progs[sc.nextInt()].image[0]);
             }
             if (input.equals("dumpM")) {
-                so.utils.dump(sc.nextInt(), sc.nextInt());
+                int lower = sc.nextInt();
+                int upper = sc.nextInt();
+                if(upper == -1){
+                    upper = hw.mem.pos.length;
+                }
+                so.utils.dump(lower, upper);
             }
             if (input.equals("exec")) {
 				int index = sc.nextInt();
 				GP.PCB pcb = this.so.gp.prontos.get(index);
 				so.utils.loadAndExec(progs.retrieveProgram(pcb.getNome()), traceOn);
-			}
+                // Executa o processo com o id especificado
+                //this.so.gp.desalocaProcesso(index); //desaloca após execução
+
+            }
             if (input.equals("execAll")) {
                 execAll(traceOn);
             }
@@ -98,7 +108,6 @@ public class Sistema {
             if(input.equals("traceOff")){
                 traceOn = false;
             }
-
         } while (!input.equals("exit"));
 
 		// so.utils.loadAndExec(progs.retrieveProgram("fatorial"));
@@ -111,13 +120,13 @@ public class Sistema {
 		// PC, // bubble sort
 	}
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws InterruptedException {
 		Sistema s = new Sistema(1024);
 		s.run();
 
 	}
 
-    public void execAll(boolean trace) {
+    public void execAll(boolean trace) throws InterruptedException {
         int delta = 5;
         List<GP.PCB> prontos = so.gp.prontos;
 
@@ -130,6 +139,7 @@ public class Sistema {
 
                 // Recupera contexto do processo
                 hw.cpu.setPC(pcb.pc);
+                System.out.println("==> PC do processo " + pcb.getId() + ": " + pcb.pc);
                 if (pcb.getRegistradores() == null) {
                     hw.cpu.setRegs(new int[10]); // inicializa regs
                 } else {
@@ -148,7 +158,6 @@ public class Sistema {
                 if (hw.cpu.terminou()) {
                     System.out.println("==> Processo " + pcb.getId() + " terminou.");
                     pcb.setFinalizado(true);
-                    so.gm.desaloca(pcb.tabelaPaginas);
                     prontos.remove(i);
                     i--; // ajustar índice pois removeu da lista
                 }

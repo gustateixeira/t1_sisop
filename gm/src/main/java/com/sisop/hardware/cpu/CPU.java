@@ -1,11 +1,11 @@
-package com.sisop.hardware.cpu;
+package main.java.com.sisop.hardware.cpu;
 
 
-import com.sisop.hardware.memoria.Memory;
-import com.sisop.hardware.memoria.Word;
-import com.sisop.software.rotinasDeTratamento.InterruptHandling;
-import com.sisop.software.rotinasDeTratamento.SysCallHandling;
-import com.sisop.software.utilidades.Utilities;
+import main.java.com.sisop.hardware.memoria.Memory;
+import main.java.com.sisop.hardware.memoria.Word;
+import main.java.com.sisop.software.rotinasDeTratamento.InterruptHandling;
+import main.java.com.sisop.software.rotinasDeTratamento.SysCallHandling;
+import main.java.com.sisop.software.utilidades.Utilities;
 
 public class CPU {
     private int maxInt; // valores maximo e minimo para inteiros nesta cpu

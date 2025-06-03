@@ -1,7 +1,6 @@
-package com.sisop.software.gm;
-import com.sisop.hardware.cpu.Opcode;
-import com.sisop.hardware.memoria.Memory;
-import com.sisop.hardware.memoria.Word;
+package main.java.com.sisop.software.gm;
+import main.java.com.sisop.hardware.memoria.Memory;
+import main.java.com.sisop.hardware.memoria.Word;
 
 import java.util.Arrays;
 
@@ -28,10 +27,13 @@ public class GM{
 
         int pagsNecess = 1;
 
-        if(nroPalavras > TAMPG){
-            pagsNecess = (int)(nroPalavras/TAMPG) + 1 ;
+        if(nroPalavras > TAMPG) {
+            if(nroPalavras % TAMPG == 0) {
+                pagsNecess = nroPalavras / TAMPG;
+            } else {
+                pagsNecess = (int) (nroPalavras / TAMPG) + 1;
+            }
         }
-
         int livres = OCUPADO.length - posOcupadas;
 
         if(pagsNecess > livres){
@@ -41,7 +43,7 @@ public class GM{
 
         int j = 0;
 
-        for(int i = 0; i < OCUPADO.length; i++){
+        for(int i = 0; i < OCUPADO.length-1; i++){
             if(pagsNecess > 0){
                 if(!OCUPADO[i]){
                     OCUPADO[i] = true;
@@ -52,16 +54,14 @@ public class GM{
                 }
             }
         }
+        System.out.println(Arrays.toString(OCUPADO));
         return true;
     }
 
     public void desaloca(int[] tabelaPaginas){
-        System.out.println("Desalocando");
         if(tabelaPaginas == null){
             return;
         } else {
-            System.out.println("Desalocando 0");
-            Word[] memo = this.m.pos;
             for (int tabelaPagina : tabelaPaginas) {
                 OCUPADO[tabelaPagina] = false;
             }
