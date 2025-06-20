@@ -54,7 +54,7 @@ public class GM{
                 }
             }
         }
-        System.out.println(Arrays.toString(OCUPADO));
+        System.out.println(Arrays.toString(tabelaPaginas));
         return true;
     }
 

@@ -16,6 +16,7 @@ public class GP {
         private long id;
         private static long idCounter = 0;
         public int pc;
+        public int base;
         private int memSize;
         public int[] tabelaPaginas;
         private String nome;
@@ -26,8 +27,7 @@ public class GP {
             this.estado = false;
             this.id = idCounter++;
         }
-
-        public void setId(long id) { this.id = id; }
+        public void atualizaBase(int newBase){this.base = base;}
         public void setPc(int pc) { this.pc = pc; }
         public void setMemSize(int memSize) { this.memSize = memSize; }
         public void setTabelaPaginas(int[] tabelaPg) { this.tabelaPaginas = tabelaPg; }
@@ -76,18 +76,22 @@ public class GP {
         int indexMemoria = 0;
         for (int i = 0; i < pagsNecessarias; i++) {
             int frameBase = tabelaPaginas[i] * tamPag;
+            System.out.println("Carregando página " + i + " na moldura " + tabelaPaginas[i] + " (endereço base: " + frameBase + ")");
             for (int j = 0; j < tamPag && indexMemoria < p.image.length; j++) {
                 hw.mem.pos[frameBase + j].opc = p.image[indexMemoria].opc;
                 hw.mem.pos[frameBase + j].ra = p.image[indexMemoria].ra;
                 hw.mem.pos[frameBase + j].rb = p.image[indexMemoria].rb;
                 hw.mem.pos[frameBase + j].p = p.image[indexMemoria].p;
+                System.out.println("  Mem[" + (frameBase + j) + "] = " + p.image[indexMemoria].opc + "," +
+                        p.image[indexMemoria].ra + "," + p.image[indexMemoria].rb + "," +
+                        p.image[indexMemoria].p);
                 indexMemoria++;
             }
         }
 
         PCB pcb = new PCB();
-        pcb.setPc(0);
         pcb.setTabelaPaginas(tabelaPaginas);
+        pcb.setPc(tamPag*pcb.tabelaPaginas[0]);
         pcb.setMemSize(p.image.length);
         pcb.setEstado(false);
         pcb.setNome(p.name);

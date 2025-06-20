@@ -2,6 +2,7 @@ package main.java.com.sisop.software.utilidades;
 
 import main.java.com.sisop.hardware.HW;
 import  main.java.com.sisop.hardware.memoria.Word;
+import java.util.Scanner;
 
 public class Utilities {
     private HW hw;
@@ -13,10 +14,10 @@ public class Utilities {
     private void loadProgram(Word[] p) {
         Word[] m = hw.mem.pos; // m[] é o array de posições memória do hw
         for (int i = 0; i < p.length; i++) {
-            m[i].opc = p[i].opc;
-            m[i].ra = p[i].ra;
-            m[i].rb = p[i].rb;
-            m[i].p = p[i].p;
+            m[i+hw.cpu.pc].opc = p[i].opc;
+            m[i+hw.cpu.pc].ra = p[i].ra;
+            m[i+hw.cpu.pc].rb = p[i].rb;
+            m[i+hw.cpu.pc].p = p[i].p;
         }
     }
 
@@ -44,12 +45,13 @@ public class Utilities {
 
     public void loadAndExec(Word[] p, boolean traceOn) {
         loadProgram(p); // carga do programa na memoria
+        System.out.println("PC:"+hw.cpu.pc);
         System.out.println("---------------------------------- programa carregado na memoria");
-        dump(0, p.length); // dump da memoria nestas posicoes
-        hw.cpu.setContext(0); // seta pc para endereço 0 - ponto de entrada dos programas
+        dump(hw.cpu.pc, hw.cpu.pc+p.length); // dump da memoria nestas posicoes
         System.out.println("---------------------------------- inicia execucao ");
-        hw.cpu.run(traceOn); // cpu roda programa ate parar
+        int sc = new Scanner(System.in).nextInt();
+        hw.cpu.run(traceOn,hw.cpu.pc); // cpu roda programa ate parar
         System.out.println("---------------------------------- memoria após execucao ");
-        dump(0, p.length); // dump da memoria com resultado
+        dump(hw.cpu.pc, p.length); // dump da memoria com resultado
     }
 }

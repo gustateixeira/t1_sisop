@@ -15,4 +15,7 @@ public class Word {    // cada posicao da memoria tem uma instrucao (ou um dado)
         rb = _rb;
         p  = _p;
     }
+    public String toString(){
+        return this.opc + " " + this.ra + " " + this.rb + " " + this.p + "\n";
+    }
 }

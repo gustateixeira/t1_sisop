@@ -3,7 +3,7 @@ package main.java.com.sisop.hardware.memoria;
 import main.java.com.sisop.hardware.cpu.Opcode;
 
 public class Memory {
-		public Word[] pos; // pos[i] é a posição i da memória. cada posição é uma palavra.
+		public main.java.com.sisop.hardware.memoria.Word[] pos; // pos[i] é a posição i da memória. cada posição é uma palavra.
 
 		public Memory(int size) {
 			pos = new Word[size];
