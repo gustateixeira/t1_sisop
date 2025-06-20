@@ -22,6 +22,7 @@
     //    Veja o main.  Ele instancia o Sistema com os elementos mencionados acima.
     //           em seguida solicita a execução de algum programa com  loadAndExec
 
+    import com.sisop.software.escalonador.Escalonador;
     import main.java.com.sisop.hardware.HW;
     import main.java.com.sisop.programas.Programs;
     import main.java.com.sisop.software.gp.GP;
@@ -34,12 +35,14 @@
         public HW hw;
         public SO so;
         public Programs progs;
+        public Escalonador scheduler;
 
         public Sistema(int tamMem) {
             hw = new HW(tamMem);           // memoria do HW tem tamMem palavras
             so = new SO(hw);
             hw.cpu.setUtilities(so.utils); // permite cpu fazer dump de memoria ao avancar
             progs = new Programs();
+            scheduler = new Escalonador(5,so.gp);
         }
 
 
@@ -100,7 +103,7 @@
 
                 }
                 if (input.equals("execAll")) {
-                    execAll(traceOn);
+                    scheduler.execAll(this.hw);
                 }
                 if(input.equals("traceOn")){
                     traceOn = true;
@@ -125,44 +128,5 @@
             s.run();
 
         }
-
-        public void execAll(boolean trace) throws InterruptedException {
-            int quantum = 5;  // e
-            Queue<GP.PCB> prontos = new ArrayDeque<>(so.gp.prontos);
-            System.out.println("Prontos" + prontos);
-            while (!prontos.isEmpty()) {
-                for (int i = 0; i < prontos.size(); i++) {
-                    GP.PCB pcb = prontos.peek();
-
-
-                    // Recupera contexto do processo
-                    hw.cpu.setPC(pcb.pc);
-                    if (pcb.getRegistradores() == null) {
-                        hw.cpu.setRegs(new int[10]); // inicializa regs
-                    } else {
-                        hw.cpu.setRegs(pcb.getRegistradores());
-                    }
-
-                    // Executa fatia de tempo
-                    pcb.atualizaBase(pcb.tabelaPaginas[0]);
-                    hw.cpu.runFor(quantum, trace,pcb.base);
-
-                    // Salva contexto de volta no PCB
-                    pcb.setPc(hw.cpu.getPC());
-                    pcb.setRegistradores(hw.cpu.getRegs());
-
-
-                    // Verifica se chegou ao STOP (simplesmente checando se pc saiu do programa)
-                    // alternativa: use uma flag setada no SysCallHandling ou CPU
-                    if (hw.cpu.terminou()) {
-                        pcb.setFinalizado(true);
-                        prontos.remove();
-                    }
-                }
-            }
-        }
-
-
-
 
     }

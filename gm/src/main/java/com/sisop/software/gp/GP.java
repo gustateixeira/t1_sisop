@@ -47,13 +47,12 @@ public class GP {
     }
 
     public List<PCB> prontos;
-    public List<PCB> rodando;
+    public PCB rodando;
     private GM gm;
 
     public GP(HW hw, GM gm) {
         this.hw = hw;
         this.gm = gm;
-        this.rodando = new ArrayList<>();
         this.prontos = new ArrayList<>();
     }
 
@@ -107,4 +106,5 @@ public class GP {
             prontos.remove(desaloc);
         }
     }
+
 }
