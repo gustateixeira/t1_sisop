@@ -20,14 +20,14 @@ public class GP {
         private int memSize;
         public int[] tabelaPaginas;
         private String nome;
-        private int[] registradores;
+        private int[] registradores = new int[8];
         private boolean finalizado = false;
 
         public PCB() {
             this.estado = false;
             this.id = idCounter++;
         }
-        public void atualizaBase(int newBase){this.base = base;}
+        public void setBase(int newBase){this.base = newBase;}
         public void setPc(int pc) { this.pc = pc; }
         public void setMemSize(int memSize) { this.memSize = memSize; }
         public void setTabelaPaginas(int[] tabelaPg) { this.tabelaPaginas = tabelaPg; }
@@ -42,7 +42,7 @@ public class GP {
 
         public String toString() {
             return "Nome: " + nome + " Id: " + id + " Pc: " + pc + " memSize: " + memSize +
-                    " Tabela de paginas: " + Arrays.toString(tabelaPaginas);
+                    " Tabela de paginas: " + Arrays.toString(tabelaPaginas) + "Base: " + this.base;
         }
     }
 
@@ -93,6 +93,7 @@ public class GP {
         pcb.setPc(tamPag*pcb.tabelaPaginas[0]);
         pcb.setMemSize(p.image.length);
         pcb.setEstado(false);
+        pcb.setBase(tabelaPaginas[0]*tamPag);
         pcb.setNome(p.name);
         prontos.add(pcb);
         return true;

@@ -42,7 +42,7 @@
             so = new SO(hw);
             hw.cpu.setUtilities(so.utils); // permite cpu fazer dump de memoria ao avancar
             progs = new Programs();
-            scheduler = new Escalonador(5,so.gp);
+            scheduler = new Escalonador(5,so.gp, hw);
         }
 
 
@@ -103,7 +103,9 @@
 
                 }
                 if (input.equals("execAll")) {
-                    scheduler.execAll(this.hw);
+                    while(!this.so.gp.prontos.isEmpty()) {
+                        scheduler.schedule();
+                    }
                 }
                 if(input.equals("traceOn")){
                     traceOn = true;

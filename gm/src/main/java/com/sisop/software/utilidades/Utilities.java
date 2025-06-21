@@ -49,7 +49,6 @@ public class Utilities {
         System.out.println("---------------------------------- programa carregado na memoria");
         dump(hw.cpu.pc, hw.cpu.pc+p.length); // dump da memoria nestas posicoes
         System.out.println("---------------------------------- inicia execucao ");
-        int sc = new Scanner(System.in).nextInt();
         hw.cpu.run(traceOn,hw.cpu.pc); // cpu roda programa ate parar
         System.out.println("---------------------------------- memoria após execucao ");
         dump(hw.cpu.pc, p.length); // dump da memoria com resultado

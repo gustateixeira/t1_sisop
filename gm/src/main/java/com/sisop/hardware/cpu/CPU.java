@@ -5,7 +5,9 @@
     import main.java.com.sisop.hardware.memoria.Word;
     import main.java.com.sisop.software.rotinasDeTratamento.InterruptHandling;
     import main.java.com.sisop.software.rotinasDeTratamento.SysCallHandling;
+    import main.java.com.sisop.hardware.cpu.Interrupts;
     import main.java.com.sisop.software.utilidades.Utilities;
+    import  main.java.com.sisop.hardware.cpu.Opcode;
 
 
     import java.util.Arrays;
@@ -41,8 +43,8 @@
             minInt = -32767;           // se exceder deve gerar interrupcao de overflow
             m = _mem.pos;              // usa o atributo 'm' para acessar a memoria, só para ficar mais pratico
             reg = new int[10];         // aloca o espaço dos registradores - regs 8 e 9 usados somente para IO
-
-            debug = _debug;            // se true, print da instrucao em execucao
+            this.irpt = Interrupts.noInterrupt;
+            debug = _debug;
 
         }
 
@@ -96,11 +98,12 @@
             return terminouComStop;
         }
 
-        public void runFor(int delta, boolean trace, int offset) {
+        public void runFor(int quantum,int offset) {
             terminouComStop = false;
             cpuStop = false;
+            irpt = Interrupts.noInterrupt;
             int executed = 0;
-            while (!cpuStop && executed < delta) {
+            while (!cpuStop && executed < quantum) {
                    if (legal(pc)) {
                         ir = m[pc];
 
@@ -289,11 +292,16 @@
                         }
                     }
                     if (irpt != Interrupts.noInterrupt) {
+                        System.out.println(irpt);
                         ih.handle(irpt);
                         cpuStop = true;
                     }
                     executed++;
                 }
+            if (!terminouComStop && executed >= quantum) {
+                irpt = Interrupts.intQuantum;
+            }
+
         }
         public void setContext(int _pc) {                 // usado para setar o contexto da cpu para rodar um processo
             // [ nesta versao é somente colocar o PC na posicao 0 ]
