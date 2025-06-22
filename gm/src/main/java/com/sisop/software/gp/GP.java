@@ -3,6 +3,9 @@ package main.java.com.sisop.software.gp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import main.java.com.sisop.hardware.HW;
 import main.java.com.sisop.programas.Programs;
@@ -28,7 +31,7 @@ public class GP {
             this.id = idCounter++;
         }
         public void setBase(int newBase){this.base = newBase;}
-        public void setPc(int pc) { this.pc = pc; }
+        public void setPc(int pc) {  this.pc = pc; }
         public void setMemSize(int memSize) { this.memSize = memSize; }
         public void setTabelaPaginas(int[] tabelaPg) { this.tabelaPaginas = tabelaPg; }
         public void setEstado(boolean state) { this.estado = state; }
@@ -46,14 +49,14 @@ public class GP {
         }
     }
 
-    public List<PCB> prontos;
+    public BlockingQueue<PCB> prontos;
     public PCB rodando;
     private GM gm;
 
     public GP(HW hw, GM gm) {
         this.hw = hw;
         this.gm = gm;
-        this.prontos = new ArrayList<>();
+        this.prontos = new LinkedBlockingQueue<>();
     }
 
     public boolean criaProcesso(Programs.Program p) {

@@ -1,66 +1,71 @@
-    package com.sisop.software.escalonador;
+        package com.sisop.software.escalonador;
 
-    import main.java.com.sisop.hardware.HW;
-    import main.java.com.sisop.software.rotinasDeTratamento.InterruptHandling;
-    import main.java.com.sisop.software.gp.GP;
+        import main.java.com.sisop.hardware.HW;
+        import main.java.com.sisop.software.rotinasDeTratamento.InterruptHandling;
+        import main.java.com.sisop.software.gp.GP;
 
 
-    public class Escalonador {
-        public  int QUANTUM; //numero de operacoes do round-robin
-        private int quantumContador = 0; //contador
-        private boolean running = true;
-        private GP gp;
-        private HW hw;
+        public class Escalonador extends Thread {
+            public  int QUANTUM; //numero de operacoes do round-robin
+            private boolean running = true;
+            private GP gp;
+            private HW hw;
 
-        private InterruptHandling ih = new InterruptHandling(hw, this);
-        public Escalonador(int quantum, GP gp, HW hw){
-            QUANTUM = quantum;
-            this.gp = gp;
-            this.hw = hw;
-        }
-        public void schedule(){
+            public volatile GP.PCB proximoProcesso;
+            private main.java.com.sisop.hardware.cpu.CPU cpu;
 
-            // Atualizar o PCB do processo em execução com o contexto da CPU
-            GP.PCB processoAtual = gp.rodando;
-            if (processoAtual != null && !processoAtual.isFinalizado()) {
-                processoAtual.setRegistradores(hw.cpu.reg.clone());
-                processoAtual.setPc(hw.cpu.pc);
-                gp.prontos.add(processoAtual);
+            private InterruptHandling ih;
+            public main.java.com.sisop.Sistema sistema;
+            public Escalonador(int quantum, GP gp, HW hw, main.java.com.sisop.Sistema s){
+                QUANTUM = quantum;
+                this.gp = gp;
+                this.hw = hw;
+                this.cpu = hw.cpu;
+                this.sistema = s;
+                this.ih = new InterruptHandling(hw, this, s);
             }
-            if (gp.prontos.isEmpty()) {
-                return;
-            }
+            public void run(){
+                while(true) {
+                    try{
+                    this.sistema.sem.acquire();
+                    // Atualizar o PCB do processo em execução com o contexto da CPU
+                    GP.PCB processoAtual = gp.rodando;
+                    if (processoAtual != null && !processoAtual.isFinalizado()) {
+                        processoAtual.setRegistradores(hw.cpu.reg.clone());
+                        processoAtual.setPc(hw.cpu.pc);
+                    }
+                    if (gp.prontos.isEmpty()) {
+                        return;
+                    }
 
-            // Selecionar o próximo processo da lista de prontos para execução
-            GP.PCB proximoProcesso = gp.prontos.remove(0);
-            if (proximoProcesso != null) {
-                // Atualizar a CPU com o contexto do próximo processo
-                hw.cpu.pc = proximoProcesso.pc;
-                hw.cpu.reg = proximoProcesso.getRegistradores().clone();
-                gp.rodando = proximoProcesso;
-                hw.cpu.runFor(QUANTUM,proximoProcesso.base);
-                if(!proximoProcesso.isFinalizado()){
-                    salvaContexto();
+                    // Selecionar o próximo processo da lista de prontos para execução
+                    this.proximoProcesso = gp.prontos.poll();
+                    if (this.proximoProcesso != null) {
+                        // Atualizar a CPU com o contexto do próximo processo
+                        hw.cpu.pc = this.proximoProcesso.pc;
+                        hw.cpu.reg = this.proximoProcesso.getRegistradores().clone();
+                        gp.rodando = this.proximoProcesso;
+                        hw.cpu.executando = this.proximoProcesso;
+                        this.cpu.libera();
+                    }
+                    }catch (InterruptedException e){
+                        break;
+                    }
                 }
             }
-
-            //printa o processo em execução
-            if (gp.rodando == null) return;
-
-        }
-        public void salvaContexto(){
-            if (gp.rodando != null) {
-                gp.rodando.setPc(hw.cpu.pc);
-                gp.rodando.setRegistradores(hw.cpu.reg.clone());
-                gp.prontos.add(gp.rodando);
-                gp.rodando = null;
+            public void salvaContexto(){
+                if (gp.rodando != null) {
+                    gp.rodando.setPc(hw.cpu.pc);
+                    gp.rodando.setRegistradores(hw.cpu.reg.clone());
+                    gp.prontos.add(gp.rodando);
+                    gp.rodando = null;
+                }
             }
-        }
-        public void setFinalizado(){
-            this.gp.rodando.setFinalizado(true);
-            this.gp.prontos.remove(this.gp.rodando);
-        }
+            public void setFinalizado(){
+                this.gp.rodando.setFinalizado(true);
+                this.gp.prontos.remove(this.gp.rodando);
+            }
 
-    }
+        }
 
 

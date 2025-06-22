@@ -4,8 +4,8 @@ import com.sisop.software.escalonador.Escalonador;
 import main.java.com.sisop.hardware.HW;
 
 public class SysCallHandling {
-		private HW hw; // referencia ao hw se tiver que setar algo
-		private  Escalonador escalonador;
+		private final HW hw; // referencia ao hw se tiver que setar algo
+		private final Escalonador escalonador;
 		public SysCallHandling(HW _hw, Escalonador escalonador) {
 			hw = _hw;
 			this.escalonador = escalonador;

@@ -44,13 +44,6 @@ public class Utilities {
     }
 
     public void loadAndExec(Word[] p, boolean traceOn) {
-        loadProgram(p); // carga do programa na memoria
-        System.out.println("PC:"+hw.cpu.pc);
-        System.out.println("---------------------------------- programa carregado na memoria");
-        dump(hw.cpu.pc, hw.cpu.pc+p.length); // dump da memoria nestas posicoes
-        System.out.println("---------------------------------- inicia execucao ");
-        hw.cpu.run(traceOn,hw.cpu.pc); // cpu roda programa ate parar
-        System.out.println("---------------------------------- memoria após execucao ");
-        dump(hw.cpu.pc, p.length); // dump da memoria com resultado
+        //
     }
 }

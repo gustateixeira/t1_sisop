@@ -1,6 +1,7 @@
 package main.java.com.sisop.software.gm;
 import main.java.com.sisop.hardware.memoria.Memory;
 import main.java.com.sisop.hardware.memoria.Word;
+import main.java.com.sisop.hardware.cpu.Interrupts;
 
 import java.util.Arrays;
 
@@ -11,7 +12,9 @@ public class GM{
     private final boolean[] OCUPADO; //se ocupado = true, se livre = false
     private int posOcupadas = 0;
     private Memory m;
-    
+
+    private main.java.com.sisop.hardware.cpu.CPU cpu;
+
     public GM(int tamPg, int tamMem, Memory m ){
         this.TAMPG = tamPg;
         this.TAMMEM = tamMem;
@@ -20,6 +23,9 @@ public class GM{
         this.m = m;
     }
 
+    public void setCpu(main.java.com.sisop.hardware.cpu.CPU cpu){
+        this.cpu = cpu;
+    }
     public boolean aloca(int nroPalavras, int[] tabelaPaginas){
         if(nroPalavras == 0){
             return false;
@@ -70,6 +76,12 @@ public class GM{
 
     public int getTamanhoPagina() {
         return TAMPG;
+    }
+
+    public int traduzEndereco(int enderecoLogico, int[] tabelaPaginas){
+        int entrada = tabelaPaginas[0];
+
+        return entrada * TAMPG;
     }
 
 }

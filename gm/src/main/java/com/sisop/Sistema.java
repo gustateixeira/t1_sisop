@@ -29,6 +29,7 @@
     import main.java.com.sisop.software.so.SO;
 
     import java.util.*;
+    import java.util.concurrent.Semaphore;
 
     public class Sistema {
 
@@ -36,13 +37,19 @@
         public SO so;
         public Programs progs;
         public Escalonador scheduler;
+        public final Semaphore sem;
+
 
         public Sistema(int tamMem) {
             hw = new HW(tamMem);           // memoria do HW tem tamMem palavras
-            so = new SO(hw);
-            hw.cpu.setUtilities(so.utils); // permite cpu fazer dump de memoria ao avancar
+            so = new SO(hw, this);
+            hw.cpu.setUtilities(so.utils);
+            hw.cpu.setGm(so.gm);// permite cpu fazer dump de memoria ao avancar
             progs = new Programs();
-            scheduler = new Escalonador(5,so.gp, hw);
+            hw.cpu.start();
+            this.sem = new Semaphore(1);
+            scheduler = new Escalonador(5,so.gp, hw, this);
+
         }
 
 
@@ -81,7 +88,6 @@
                 }
                 if (input.equals("dump")) {
                     int i = sc.nextInt();
-                    System.out.println(this.so.gp.prontos.get(i - 1));
                     so.utils.dump(progs.progs[sc.nextInt()].image[0]);
                 }
                 if (input.equals("dumpM")) {
@@ -92,19 +98,10 @@
                     }
                     so.utils.dump(lower, upper);
                 }
-                if (input.equals("exec")) {
-                    int index = sc.nextInt();
-                    GP.PCB pcb = this.so.gp.prontos.get(index);
-                    hw.cpu.setContext(pcb.pc);
-                    System.out.println("PC"+hw.cpu.pc);
-                    so.utils.loadAndExec(progs.retrieveProgram(pcb.getNome()), traceOn);
-                    // Executa o processo com o id especificado
-                    //this.so.gp.desalocaProcesso(index); //desaloca após execução
-
-                }
                 if (input.equals("execAll")) {
-                    while(!this.so.gp.prontos.isEmpty()) {
-                        scheduler.schedule();
+                    if(!scheduler.isAlive()) {
+                        scheduler.setName("scheduler");
+                        scheduler.start();
                     }
                 }
                 if(input.equals("traceOn")){
