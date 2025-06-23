@@ -29,6 +29,7 @@
     import main.java.com.sisop.software.so.SO;
 
     import java.util.*;
+    import java.util.concurrent.Semaphore;
 
     public class Sistema {
 
@@ -36,41 +37,57 @@
         public SO so;
         public Programs progs;
         public Escalonador scheduler;
+        public final Semaphore sem;
+
+
 
         public Sistema(int tamMem) {
             hw = new HW(tamMem);           // memoria do HW tem tamMem palavras
-            so = new SO(hw);
-            hw.cpu.setUtilities(so.utils); // permite cpu fazer dump de memoria ao avancar
+            so = new SO(hw, this);
+            hw.cpu.setUtilities(so.utils);
+            hw.cpu.setGm(so.gm);// permite cpu fazer dump de memoria ao avancar
             progs = new Programs();
-            scheduler = new Escalonador(5,so.gp);
+            hw.cpu.start();
+            this.sem = new Semaphore(1);
+            scheduler = new Escalonador(5,so.gp, hw, this);
+            if(!scheduler.isAlive()) {
+                scheduler.setName("scheduler");
+                scheduler.start();
+            }
+
+        }
+        public void printScheduler(){
+            System.out.println(">> CPU concorrente foi iniciado.");
+            System.out.println(">> Escalonador concorrente foi iniciado.");
+            System.out.println(">> Digite 'help' para ajuda.");
+
+        }
+        public void printHelp(){
+            System.out.println("""
+                    >> COMANDOS:
+                    >> new <NOME>
+                    >> rm <id>\s
+                    >> ps
+                    >> dump<id processo>\s
+                    >> dumpM
+                    >> exit""");
         }
 
-
         public void run() throws InterruptedException {
-
-            System.out.println("""
-                    COMANDOS:\
-                    new <NOME>
-                    rm <id>\s
-                    ps
-                    dump<id processo>\s
-                    dumpM
-                    exec <id>\s
-                    traceOn\s
-                    traceOff\s
-                    execAll\s
-                    exit""");
-
+            printScheduler();
 
             Scanner sc = new Scanner(System.in);
             String input;
-            boolean traceOn = false;
             do {
                 input = sc.next();
                 if (input.equals("new")) {
                     String name = sc.next();
                     System.out.println(name);
                     this.so.gp.criaProcesso(Arrays.stream(progs.progs).filter(program -> program.name.equals(name)).findFirst().get());
+                    if(this.sem.getQueueLength() != 0) {
+                        this.sem.release();
+                    }
+
                 }
                 if (input.equals("rm")) {
                     int id = sc.nextInt();
@@ -80,8 +97,6 @@
                     System.out.println(this.so.gp.prontos);
                 }
                 if (input.equals("dump")) {
-                    int i = sc.nextInt();
-                    System.out.println(this.so.gp.prontos.get(i - 1));
                     so.utils.dump(progs.progs[sc.nextInt()].image[0]);
                 }
                 if (input.equals("dumpM")) {
@@ -92,25 +107,10 @@
                     }
                     so.utils.dump(lower, upper);
                 }
-                if (input.equals("exec")) {
-                    int index = sc.nextInt();
-                    GP.PCB pcb = this.so.gp.prontos.get(index);
-                    hw.cpu.setContext(pcb.pc);
-                    System.out.println("PC"+hw.cpu.pc);
-                    so.utils.loadAndExec(progs.retrieveProgram(pcb.getNome()), traceOn);
-                    // Executa o processo com o id especificado
-                    //this.so.gp.desalocaProcesso(index); //desaloca após execução
+                if(input.equals("help")){
+                    printHelp();
+                }
 
-                }
-                if (input.equals("execAll")) {
-                    scheduler.execAll(this.hw);
-                }
-                if(input.equals("traceOn")){
-                    traceOn = true;
-                }
-                if(input.equals("traceOff")){
-                    traceOn = false;
-                }
             } while (!input.equals("exit"));
 
             // so.utils.loadAndExec(progs.retrieveProgram("fatorial"));
