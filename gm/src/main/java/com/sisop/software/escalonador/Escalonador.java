@@ -34,12 +34,10 @@
                         processoAtual.setRegistradores(hw.cpu.reg.clone());
                         processoAtual.setPc(hw.cpu.pc);
                     }
-                    if (gp.prontos.isEmpty()) {
-                        return;
-                    }
+
 
                     // Selecionar o próximo processo da lista de prontos para execução
-                    this.proximoProcesso = gp.prontos.poll();
+                    this.proximoProcesso = gp.prontos.take();
                     if (this.proximoProcesso != null) {
                         // Atualizar a CPU com o contexto do próximo processo
                         hw.cpu.pc = this.proximoProcesso.pc;

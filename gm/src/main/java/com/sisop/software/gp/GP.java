@@ -7,6 +7,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.sisop.software.gp.Estados;
 import main.java.com.sisop.hardware.HW;
 import main.java.com.sisop.programas.Programs;
 import main.java.com.sisop.software.gm.GM;
@@ -15,7 +16,7 @@ public class GP {
     private HW hw;
 
     public class PCB {
-        private boolean estado;
+        private Estados estado;
         private long id;
         private static long idCounter = 0;
         public int pc;
@@ -27,17 +28,15 @@ public class GP {
         private boolean finalizado = false;
 
         public PCB() {
-            this.estado = false;
+            this.estado = Estados.READY;
             this.id = idCounter++;
         }
         public void setBase(int newBase){this.base = newBase;}
         public void setPc(int pc) {  this.pc = pc; }
         public void setMemSize(int memSize) { this.memSize = memSize; }
         public void setTabelaPaginas(int[] tabelaPg) { this.tabelaPaginas = tabelaPg; }
-        public void setEstado(boolean state) { this.estado = state; }
+        public void setEstado(Estados state) { this.estado = state; }
         public void setNome(String nome) { this.nome = nome; }
-        public long getId() { return this.id; }
-        public String getNome() { return this.nome; }
         public void setRegistradores(int[] r) { this.registradores = r.clone(); }
         public int[] getRegistradores() { return this.registradores; }
         public void setFinalizado(boolean f) { this.finalizado = f; }
@@ -50,6 +49,7 @@ public class GP {
     }
 
     public BlockingQueue<PCB> prontos;
+    public BlockingQueue<PCB> bloqueados;
     public PCB rodando;
     private GM gm;
 
@@ -95,7 +95,6 @@ public class GP {
         pcb.setTabelaPaginas(tabelaPaginas);
         pcb.setPc(tamPag*pcb.tabelaPaginas[0]);
         pcb.setMemSize(p.image.length);
-        pcb.setEstado(false);
         pcb.setBase(tabelaPaginas[0]*tamPag);
         pcb.setNome(p.name);
         prontos.add(pcb);
